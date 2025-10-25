@@ -21,26 +21,27 @@ def build_message(ticker, headline, risk, extra_note):
 
 
 def send_alert(ticker, headline, risk, extra_note):
+    # Hent opsætning fra Render Environment
     alert_to = os.environ.get("ALERT_TO")
     alert_from = os.environ.get("ALERT_FROM")
-    smtp_host = os.environ.get("SMTP_HOST")
-    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
-    smtp_user = os.environ.get("SMTP_USER")
-    smtp_pass = os.environ.get("SMTP_PASS")
+    smtp_host = os.environ.get("SMTP_HOST")        # fx smtp.gmail.com
+    smtp_port = int(os.environ.get("SMTP_PORT"))   # fx 587
+    smtp_user = os.environ.get("SMTP_USER")        # din Gmail
+    smtp_pass = os.environ.get("SMTP_PASS")        # Gmail app password
 
     body = build_message(ticker, headline, risk, extra_note)
+
     msg = MIMEText(body, "plain", "utf-8")
     msg["Subject"] = f"AKTIE HEADS-UP: {ticker}"
     msg["From"] = alert_from
     msg["To"] = alert_to
 
-with smtplib.SMTP(smtp_host, smtp_port) as server:
-    server.connect(smtp_host, smtp_port)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(smtp_user, smtp_pass)
-    server.send_message(msg)
-
+    # Gmail SMTP-sekvens
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(smtp_user, smtp_pass)
+        server.send_message(msg)
 
     print(f"[ALERT SENT] {ticker}")
