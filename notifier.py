@@ -34,9 +34,13 @@ def send_alert(ticker, headline, risk, extra_note):
     msg["From"] = alert_from
     msg["To"] = alert_to
 
-    with smtplib.SMTP(smtp_host, smtp_port) as server:
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
-        server.send_message(msg)
+with smtplib.SMTP(smtp_host, smtp_port) as server:
+    server.connect(smtp_host, smtp_port)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    server.login(smtp_user, smtp_pass)
+    server.send_message(msg)
+
 
     print(f"[ALERT SENT] {ticker}")
